@@ -14,7 +14,7 @@ import org.apache.log4j.Logger;
  * for the low-level packet based communication with the server.
  * 
  * Before each RPC interaction, all concrete Service
- * implementations on the client side will call the checkDataTransceiver
+ * implementations will call the checkDataTransceiver
  * method ensuring that there is a valid SocketDataTransceiver object
  * 
  * This class receives error notifications from the SocketDataTransceiverReaderThread 

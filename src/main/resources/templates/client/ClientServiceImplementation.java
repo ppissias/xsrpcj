@@ -3,14 +3,8 @@ package ${server.javaPackage}.$clientSubPackage;
 import java.io.IOException;
 import java.util.Arrays;
 #if ($infrastructure.logging == "log4j")
-
-
-
 import org.apache.log4j.Logger;
 #end
-
-
-
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;

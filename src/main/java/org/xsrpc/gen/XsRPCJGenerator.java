@@ -135,7 +135,7 @@ public class XsRPCJGenerator {
 	 * @param generateInfrastructureFiles boolean flag indicating if we want to generate the infrastructure files
 	 * @param jsonFile the full path to the JSON service description
 	 * @param sourcePath the full path to the directory where the java source files and the proto file will be generated
-	 * @param protocPath path to the protocol buffers compiler executable. If present the process will also automatically compile the generated .proto file
+	 * @param protocPath path to the protocol buffers compiler executable. If present the process will also automatically compile the generated .proto files
 	 * @throws Exception 
 	 */
 	public synchronized static void generate(boolean generateClientFiles, boolean generateServerFiles,

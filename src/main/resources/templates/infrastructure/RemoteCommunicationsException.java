@@ -2,6 +2,7 @@ package $infrastructure.javaPackage;
 
 
 /**
+ * Remote Communications Exception
  * @author Petros Pissias
  *
  */
