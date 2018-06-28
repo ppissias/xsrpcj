@@ -1,0 +1,7 @@
+org\xsrpc\gen\XsRPCJGenerator.class
+org\xsrpc\gen\ServiceConfigurationReader$Service.class
+org\xsrpc\gen\XsRPCJGenerator$generatorCounter.class
+org\xsrpc\gen\ServiceConfigurationReader$Infrastructure.class
+org\xsrpc\gen\ServiceConfigurationReader$Server.class
+org\xsrpc\gen\ServiceConfigurationReader.class
+org\xsrpc\gen\ServiceConfigurationReader$ServiceDescription.class
