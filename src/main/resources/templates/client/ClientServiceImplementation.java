@@ -66,6 +66,24 @@ public class $className extends ServiceProxy implements DataHandler, ${serviceIn
 		#end		
 	}
 
+	//constructor with default port
+	public ${className}(String host#foreach ($service in $server.services)#if ($service.hasCallback()), ${server.name}${service.serviceNameUpper}ClientCallback client${service.serviceName}Callback#end#end) {
+		super(host, ${server.port});
+		
+		//create all request / reply Handlers
+		#foreach ($service in $server.services)
+			#if ($service.hasResponse()) ##must create reply handler
+		client${service.serviceName}ReplyHandler = new ClientReplyHandler<${service.responseClassName}>(timeoutSeconds); 
+			#end
+		#end		
+		
+		//keep references to all service callbacks
+		#foreach ($service in $server.services)
+			#if ($service.hasCallback()) ##must store callback
+		this.client${service.serviceName}Callback = client${service.serviceName}Callback;
+			#end
+		#end		
+	}	
 	
 	//high level access methods. All Req-Reply operations are atomic 
 	//and should not overlap, thus all methods are synchronized

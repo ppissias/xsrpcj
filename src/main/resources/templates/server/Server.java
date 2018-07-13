@@ -20,9 +20,16 @@ public class ${className} extends Thread {
 	
 	private final $serviceInterfaceClassName serviceHandler;
 			
-	private final int port = $server.port;	
-	
+	private final int port;	
+	private final int defaultport = $server.port; 
+			
 	public ${className}($serviceInterfaceClassName serviceHandler) {
+		port = defaultport;
+		this.serviceHandler = serviceHandler;				
+	}
+	
+	public ${className}($serviceInterfaceClassName serviceHandler, int port) {
+		this.port = port;
 		this.serviceHandler = serviceHandler;				
 	}
 	
@@ -30,6 +37,11 @@ public class ${className} extends Thread {
 		
 		try {
 			ServerSocket serverSocket = new ServerSocket(port);
+			#if ($infrastructure.logging == "log4j")
+			logger.error("Listening for connections on port:"+port);
+			#elseif ($infrastructure.logging == "System")
+			System.out.println("Listening for connections on port:"+port);		
+			#end
 			
 			while (true) {
 				#if ($infrastructure.logging == "log4j")

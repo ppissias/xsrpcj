@@ -92,8 +92,9 @@ public class XsRPCJGenerator {
 	
 		Logger logger = LoggerFactory.getLogger(XsRPCJGenerator.class);
 
+		String cmd_usage = "expected arguments: [-client] [-server] [-infrastructure] <source generation path> <service-description-file> ";
 		if (args.length < 3 || args.length > 5) {
-			System.out.println("expected arguments: [-client] [-server] [-infrastructure] <source generation path> <service-description-file>");
+			System.out.println(cmd_usage);
 			return;
 		}
 		
@@ -115,7 +116,7 @@ public class XsRPCJGenerator {
 		
 		if ( (generateClientFiles | generateServerFiles | generateInfrastructureFiles) == false ) {
 			//all false
-			System.out.println("expected arguments: [-client] [-server] [-infrastructure] <source generation path> <service-description-file>");
+			System.out.println(cmd_usage);
 			logger.info("at least one of the options -client, -server, -infrastructure must be specified");
 			return;
 		}
@@ -198,7 +199,7 @@ public class XsRPCJGenerator {
 			generateProtoFile(server, sourcePath);
 		}
 
-		String protoSourcePath =sourcePath+"/proto"; 
+		String protoSourcePath =sourcePath+"/../proto"; 
 		
 		if (protocPath == null) {
 			
@@ -210,13 +211,16 @@ public class XsRPCJGenerator {
 		} else {
 			for (Server server : servicesDesc.getServers()) {		
 				//compile the generated .proto files
-				logger.info("compiling "+protoSourcePath+"/"+server.getName()+"/proto/MessageContainer.proto");
-				ProcessBuilder pb = new ProcessBuilder(protocPath, "-I"+protoSourcePath, "--java_out="+sourcePath, protoSourcePath+"/"+server.getName()+"MessageContainer.proto");
+				String protoSourceFile = protoSourcePath+"/"+server.getName()+"MessageContainer.proto";
+				logger.info("compiling "+protoSourceFile);
+				ProcessBuilder pb = new ProcessBuilder(protocPath, "-I"+protoSourcePath, "--java_out="+sourcePath, protoSourceFile);
 				Process p = pb.start();
 				int retCode = p.waitFor();
 				if (retCode != 0) {
-					logger.info("could not compile "+sourcePath+"/"+server.getName()+"MessageContainer.proto");
-					logger.info("please compile manually with a command like: \nprotoc -I"+protoSourcePath+" --java_out="+sourcePath+" "+protoSourcePath+"/"+server.getName()+"MessageContainer.proto");
+					logger.info("could not compile "+protoSourceFile);
+					logger.info("please compile manually with a command like: \nprotoc -I"+protoSourcePath+" --java_out="+sourcePath+" "+protoSourceFile);
+				} else {
+					logger.info("compiled "+protoSourceFile);
 				}
 			}
 		}
@@ -590,7 +594,7 @@ public class XsRPCJGenerator {
 		String protoTemplateFullPath = protoTemplatePath+"/"+protoTemplateFilename;
 		String protoName = server.getName()+"MessageContainer";
 		String fileName = protoName+".proto";
-		String filePath = sourcePath + "/proto/"+fileName;
+		String filePath = sourcePath + "/../proto/"+fileName;
 		
 		//insert into context
 		//add context	
