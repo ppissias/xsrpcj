@@ -88,6 +88,7 @@ Lets look closer at the service definition, each service has :
 after invoking the xsrpcj code generator, we will get a server-side API and a client-side API. For the client-side we will get an interface & its implementation for each Server, which is all we need to start invoking services.
 
 **Client Side**
+
 For the example above we will get  a client side interface:
 
     public interface ExampleClientService {
@@ -119,10 +120,12 @@ From the client side, the way to start invoking services is :
 		//request / response / callback call
 		MessageResponse response = serverRef.requestResponseCallback(request);
 					
-Notice that we need to pass a "callback handler" when we instantiate ExampleClientServiceImpl ? We need to do this for each service that implements a callback. So if we used no services with callbacks, the constructor would not need a callback handler and if we used 10 services with callbacks, the constructor would need 10 callback handlers, one for each service. 
+Notice that we need to pass a "callback handler" (`cbHandler`) when we instantiate `ExampleClientServiceImpl` ? We need to do this for each service that implements a callback. This is needed because we need to provide a handler for the asynchronous callback messages. 
 
-In our particular case, we only have 1 services with a callback, so we need to provide just 1 callback handler. 
-The callback handler, need to implement an interface in order to receive callbacks from the server. In our example this interface looks like:
+So if we used no services with callbacks, the constructor would not need a callback handler and if we used 10 services with callbacks, the constructor would need 10 callback handlers, one for each service. 
+
+In our particular case, we only have 1 service with a callback, so we need to provide just 1 callback handler. 
+The callback handler needs to implement an interface which defines a method able to process the callback  messages. In our particular example it looks like:
 
     public interface ExampleRequestResponseCallbackClientCallback {
 		public void requestResponseCallbackCallback(CallbackResponse cb);
@@ -130,11 +133,11 @@ The callback handler, need to implement an interface in order to receive callbac
 
 Don't mind the long names... The naming convention comes from the Server and Service name descriptions, which can be as small and simple as you like, if you don't like long names.     
 
-Besides the callback, we pass 2 additional arguments:
+Besides the callback, we pass 2 additional arguments, the host where the service is implemented and the port where the server is listening for connections
 
     //get service interface 
-		ExampleClientService serverRef = new ExampleClientServiceImpl("localhost", 22100, cbHandler);
-The host where the service is implemented and the port where the server is listening for connections. Even though the service description already has a predefined port, on the client side we have the flexibility to override this setting. We could have used the default constructor which uses the predefined port:
+	ExampleClientService serverRef = new ExampleClientServiceImpl("localhost", 22100, cbHandler);
+Even though the service description already has a predefined port, on the client side we have the flexibility to override this setting. We could have used the default constructor which uses the predefined port:
 
     ExampleClientService serverRefDefaultPort = new ExampleClientServiceImpl("localhost", cbHandler);
 
@@ -144,6 +147,7 @@ On the server side, we of course need to start the server.
 
 		ExampleServerService serviceImplementation = new ExampleServerService() {
 			//interface implementation
+			//here you implement the actual service
 		};
 		//start on default port
 		new ExampleServer(serviceImplementation).start();
@@ -162,10 +166,13 @@ Lets look at the generated interface that you need to implement.
 		public MessageResponse requestResponseCallback(MessageRequest request, 	ExampleRequestResponseCallbackServerCallback callback);	
 	}
 		
-It is the kind of interface that you would expect, according to the service description. Notice that you receive a callback interface on method `requestResponseCallback` that you can use in order to asynchronously responses to the caller. The underlying implementation is automatically generated and will route back the reply to the client callback handler on the client side. 
+It is the kind of interface that you would expect, according to the service description. Notice that you receive a callback object on method `requestResponseCallback` that you can use in order to asynchronously responses to the caller. The underlying implementation is automatically generated and will route back the reply to the client callback handler on the client side. 
 
 That's it ! 
   
+## Examples
+
+Download the xsrpcj examples project which contains several examples on using xsrpcj
 
 
 ## Compiling
@@ -174,7 +181,14 @@ That's it !
 will compile everything and assemble it as a single executable jar. 
 
 ## Using the generator 
-The generator can be used by running the produced .jar and providing the required arguments: 
+The generator can be used in 2 ways: 
+
+ - by running the produced .jar and providing the required arguments
+ - programatically by invoking a static method
+
+Lets see both of them in detail: 
+
+**running the produced .jar and providing the required arguments**: 
 
     java -jar xsrpcgen-1.0-SNAPSHOT-jar-with-dependencies.jar
     

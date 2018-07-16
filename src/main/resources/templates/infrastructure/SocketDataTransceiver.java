@@ -81,6 +81,8 @@ public class SocketDataTransceiver {
 	 */
 	public SocketDataTransceiver(String host, int port, DataHandler dataHandler, ErrorHandler errorHandler) throws IOException {
 		socket = new Socket(host, port);
+		socket.setTcpNoDelay(true);
+
 		#if ($infrastructure.logging == "log4j")
 		logger.info("Connected socket to "+host+" port:"+port);
 		#end

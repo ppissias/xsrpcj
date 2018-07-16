@@ -48,6 +48,8 @@ public class ${className} extends Thread {
 				logger.info("Waiting for connection...");
 				#end
 				final Socket incomingConnection = serverSocket.accept();
+				incomingConnection.setTcpNoDelay(true);
+				
 				#if ($infrastructure.logging == "log4j")
 				logger.info("incoming connection arrived");
 				#end
