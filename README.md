@@ -65,8 +65,6 @@ Services are described in a JSON file. A simple example is provided below:
 			]
 		}		
 	]
-		}		
-	]
 	} 
 
 
