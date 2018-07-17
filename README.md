@@ -55,14 +55,15 @@ Services are described in a JSON file. A simple example is provided below:
     {
 	"servers":[
 	 	{
-			"name": "Example",
+			"name": "Persons",
 			"port": "22100",
-			"javaPackage":"org.xsrpc.example",
+			"javaPackage":"org.xsrpcj.example.simple",
 			"services":[
-				{"serviceName":"oneWayRequest", "requestType":"org.xsrpc.example.ExampleTypes.MessageRequest"},
-				{"serviceName":"requestResponse", "requestType":"org.xsrpc.example.ExampleTypes.MessageRequest", "responseType":"org.xsrpc.example.ExampleTypes.MessageResponse" },
-				{"serviceName":"requestResponseCallback", "requestType":"org.xsrpc.example.ExampleTypes.MessageRequest", "responseType":"org.xsrpc.example.ExampleTypes.MessageResponse" , "callbackType":"org.xsrpc.example.ExampleTypes.CallbackResponse" }
+				{"serviceName":"search", "requestType":"org.xsrpcj.example.simple.SearchMessages.SearchPersonRequest", "responseType":"org.xsrpcj.example.simple.SearchMessages.SearchPersonResponse" },
+				{"serviceName":"notify", "requestType":"org.xsrpcj.example.simple.SearchMessages.PersonNotificationRequest", "responseType":"org.xsrpcj.example.simple.SearchMessages.PersonNotificationResponse" , "callbackType":"org.xsrpcj.example.simple.SearchMessages.SearchPersonResponse" }
 			]
+		}		
+	]
 		}		
 	]
 	} 
@@ -71,11 +72,11 @@ Services are described in a JSON file. A simple example is provided below:
 
 
 Services are grouped into Servers. Each server implements a set of services and listens on a specific TCP port.
-In the example above, we define 3 services realized by a server named "Example". 
+In the example above, we define 2 services realized by a server named "Persons". 
 
 Lets look closer at the service definition, each service has : 
 
-- a **name** (this will be used for the generation of the name of the method in both the client and server APIs, in combination with the Server name)
+- a **name** : to identify the server (this will be used for the generation of the name of the method in both the client and server APIs, in combination with the Server name)
 
 - a **request type**: This is the data type that is sent to the server when invoking the service (the request data)
 
@@ -91,14 +92,14 @@ after invoking the xsrpcj code generator, we will get a server-side API and a cl
 
 For the example above we will get  a client side interface:
 
-    public interface ExampleClientService {
+    public interface PersonsClientService {
 
-		public void oneWayRequest(MessageRequest request) throws RemoteCommunicationsException;		
-	
-		public MessageResponse requestResponse(MessageRequest request) throws RemoteCommunicationsException;		
+	public SearchPersonResponse search(SearchPersonRequest request) throws RemoteCommunicationsException;		
 		
-		public MessageResponse requestResponseCallback(MessageRequest request) throws RemoteCommunicationsException;
+	public PersonNotificationResponse notify(PersonNotificationRequest request) throws RemoteCommunicationsException;
 	}		
+		
+
 		
 
 
@@ -108,17 +109,18 @@ and its implementation (which implements the low level RPC and encoding stuff).
 From the client side, the way to start invoking services is :
 
  
-		//get service interface 
-		ExampleClientService serverRef = new ExampleClientServiceImpl("localhost", 22100, cbHandler);
+		//get a service reference
+		PersonsClientService serverRef = new PersonsClientServiceImpl(serverHost, cbHandler);			
+
 		
 		//now we can use it to make calls on the server
 		
-		//one way call
-		serverRef.oneWayRequest(request);
 		//request / response call
-		MessageResponse response = serverRef.requestResponse(request);
+		SearchPersonResponse resp = serverRef.search(....);
+		
 		//request / response / callback call
-		MessageResponse response = serverRef.requestResponseCallback(request);
+		PersonNotificationResponse notResp = serverRef.notify(....);
+
 					
 Notice that we need to pass a "callback handler" (`cbHandler`) when we instantiate `ExampleClientServiceImpl` ? We need to do this for each service that implements a callback. This is needed because we need to provide a handler for the asynchronous callback messages. 
 
@@ -127,107 +129,119 @@ So if we used no services with callbacks, the constructor would not need a callb
 In our particular case, we only have 1 service with a callback, so we need to provide just 1 callback handler. 
 The callback handler needs to implement an interface which defines a method able to process the callback  messages. In our particular example it looks like:
 
-    public interface ExampleRequestResponseCallbackClientCallback {
-		public void requestResponseCallbackCallback(CallbackResponse cb);
+    public interface PersonsNotifyClientCallback {
+		public void notifyCallback(SearchPersonResponse cb);
 	}
 
-Don't mind the long names... The naming convention comes from the Server and Service name descriptions, which can be as small and simple as you like, if you don't like long names.     
 
-Besides the callback, we pass 2 additional arguments, the host where the service is implemented and the port where the server is listening for connections
+The naming convention comes from the Server and Service name descriptions, which can be as small and simple as you like, or long if you like detailed names.     
 
-    //get service interface 
-	ExampleClientService serverRef = new ExampleClientServiceImpl("localhost", 22100, cbHandler);
-Even though the service description already has a predefined port, on the client side we have the flexibility to override this setting. We could have used the default constructor which uses the predefined port:
+Besides the callback, we pass an additional argument, `serverHost`which is the host where the service is implemented (we can also pass a port argument, if the server listens on a different port than the default)
 
     ExampleClientService serverRefDefaultPort = new ExampleClientServiceImpl("localhost", cbHandler);
+    	
+Even though the service description already has a predefined port, on the client side we have the flexibility to override this setting.:
+
+    ExampleClientService serverRef = new ExampleClientServiceImpl("localhost", 22100, cbHandler);
+    
 
 **Server side**
   
 On the server side, we of course need to start the server. 
 
-		ExampleServerService serviceImplementation = new ExampleServerService() {
+		PersonsServerService serviceImplementation = new PersonsServerService() {
 			//interface implementation
 			//here you implement the actual service
 		};
+		
 		//start on default port
-		new ExampleServer(serviceImplementation).start();
+		new PersonsServer(serviceImplementation).start();
+
 		//start on other port than the pre-defined
-		new ExampleServer(serviceImplementation, 22123).start();
+		//new PersonsServer(serviceImplementation, 22123).start();
 
 We can use the default port, or use a custom port by invoking another constructor. Everything is automatically generated except the `serviceImplementation`, which is the actual implementation of your service. 
 Lets look at the generated interface that you need to implement. 
 
-    public interface ExampleServerService {
+    public interface PersonsServerService {
 
-		public void oneWayRequest(MessageRequest request);		
-	
-		public MessageResponse requestResponse(MessageRequest request);		
+		public SearchPersonResponse search(SearchPersonRequest request);		
 		
-		public MessageResponse requestResponseCallback(MessageRequest request, 	ExampleRequestResponseCallbackServerCallback callback);	
+		public PersonNotificationResponse notify(PersonNotificationRequest request, PersonsNotifyServerCallback callback);	
 	}
 		
-It is the kind of interface that you would expect, according to the service description. Notice that you receive a callback object on method `requestResponseCallback` that you can use in order to asynchronously responses to the caller. The underlying implementation is automatically generated and will route back the reply to the client callback handler on the client side. 
+}
+		
+It is the kind of interface that you would expect, according to the service description. Notice that you receive a callback object on method `notify` that you can use in order to send asynchronously responses to the caller. The underlying implementation is automatically generated and will route back the reply to the client callback handler on the client side. 
 
-That's it ! 
+That's it ! You can see the full example source code here for the 
+
+ - Proto message definition file :
+ - Client Implementation : 
+ - Server Implementation :
+
   
 ## Examples
 
-Download the xsrpcj examples project which contains several examples on using xsrpcj
+Download the xsrpcj examples project which contains several examples on using xsrpcj and also examples that can be used to compare the performance of xsrpcj and grpc for the same services.
 
 
 ## Compiling
 
     mvn clean compile assembly:single
-will compile everything and assemble it as a single executable jar. 
+will compile everything and assemble it as a single executable jar. You can then use the produced .jar file (see section below) in order to generate your RPC code.  You can also use it through ant and maven (see sections below)
 
 ## Using the generator 
 The generator can be used in 2 ways: 
 
  - by running the produced .jar and providing the required arguments
+	 - maven, ant & gradle integration is easy (see next chapters)
  - programatically by invoking a static method
+ 
 
 Lets see both of them in detail: 
 
-**running the produced .jar and providing the required arguments**: 
+**running the produced .jar (standalone or via ant / maven / ... ) ** : 
 
     java -jar xsrpcgen-1.0-SNAPSHOT-jar-with-dependencies.jar
     
     expected arguments: [-client] [-server] [-infrastructure] <source generation path> <service-description-file>
     
-for example assuming that you have the following service description file
+for example assuming that you have the following service description file in `proto/service-description.json`
 
     {
-		"servers":[
-		 	{
-				"name": "Example",
-				"port": "22100",
-				"javaPackage":"org.xsrpc.example",
-				"services":[
-					{"serviceName":"oneWayRequest", 	"requestType":"org.xsrpc.example.ExampleTypes.MessageRequest"},
-					{"serviceName":"requestResponse", 	"requestType":"org.xsrpc.example.ExampleTypes.MessageRequest", "responseType":"org.xsrpc.example.ExampleTypes.MessageResponse" },
-					{"serviceName":"requestResponseCallback", "requestType":"org.xsrpc.example.ExampleTypes.MessageRequest", "responseType":"org.xsrpc.example.ExampleTypes.MessageResponse" , "callbackType":"org.xsrpc.example.ExampleTypes.CallbackResponse" }
-				]
-			}		
-		], 
-		"infrastructure" : {
-			"javaPackage":"org.xsrpc.example.comms",
-			"logging":"System"
-		}	
+	"servers":[
+	 	{
+			"name": "Persons",
+			"port": "22100",
+			"javaPackage":"org.xsrpcj.example.simple",
+			"services":[
+				{"serviceName":"search", "requestType":"org.xsrpcj.example.simple.SearchMessages.SearchPersonRequest", "responseType":"org.xsrpcj.example.simple.SearchMessages.SearchPersonResponse" },
+				{"serviceName":"notify", "requestType":"org.xsrpcj.example.simple.SearchMessages.PersonNotificationRequest", "responseType":"org.xsrpcj.example.simple.SearchMessages.PersonNotificationResponse" , "callbackType":"org.xsrpcj.example.simple.SearchMessages.SearchPersonResponse" }
+			]
+		}		
+	], 
+	"infrastructure" : {
+		"javaPackage":"org.xsrpcj.example.simple.comms",
+		"logging":"System"
 	}
+	}	 
 
 
 
 when you invoke the code generator with the following arguments: 
 
-        java -jar xsrpcgen-1.0-SNAPSHOT.jar -server -client -infrastructure ../src ../proto/service-desc.json 
+        java -jar xsrpcgen-1.0-SNAPSHOT.jar -server -client -infrastructure src proto/service-desc.json 
 
 
 It will generate the required code for the server, client and the common infrastructure files (used for the low level communication). The infrastructure files are needed only once, so if you generate multiple services on the same application you do not need to generate them again and again. 
 
 In detail it will generate: 
 
- - org.xsrpc.example.comms package with all required classes (which are is common infrastructure for the client, server and the communication between them) 
- - org.xsrpc.example.
+ - org.xsrpcj.example.simple.comms package with all required classes (which are the common infrastructure for the client, server and the communication between them) 
+ - org.xsrpcj.example.simple.client package with all the client generated code and interfaces
+ - org.xsrpcj.example.simple.server with all the server generated code and interfaces 
+ - org.xsrpcj.example.simple.types which contains some internal automatically generated data types. The generator generates and compiles its own little .proto file and the resulting types are generated in this package.
 
   
 
@@ -283,6 +297,6 @@ This project is licensed under the GNU LESSER GENERAL PUBLIC LICENSE
 
   
 
-* Thanks of course to the protocol buffers developers 
+* Thanks of course to the protocol buffers developers, the velocity engine developers and the gson developers ! 
 
 

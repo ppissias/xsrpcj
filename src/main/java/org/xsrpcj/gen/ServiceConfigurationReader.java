@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.xsrpc.gen;
+package org.xsrpcj.gen;
 
 import java.io.IOException;
 import java.nio.file.Files;

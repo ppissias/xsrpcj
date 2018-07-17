@@ -1,4 +1,4 @@
-package org.xsrpc.gen;
+package org.xsrpcj.gen;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -14,9 +14,9 @@ import org.apache.velocity.runtime.RuntimeConstants;
 import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xsrpc.gen.ServiceConfigurationReader.Server;
-import org.xsrpc.gen.ServiceConfigurationReader.Service;
-import org.xsrpc.gen.ServiceConfigurationReader.ServiceDescription;
+import org.xsrpcj.gen.ServiceConfigurationReader.Server;
+import org.xsrpcj.gen.ServiceConfigurationReader.Service;
+import org.xsrpcj.gen.ServiceConfigurationReader.ServiceDescription;
 
 /**
  * This is the entry point for starting the file generator
