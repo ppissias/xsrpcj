@@ -1,5 +1,6 @@
 
 
+
 # xsrpcj
 
   
@@ -176,20 +177,24 @@ It is the kind of interface that you would expect, according to the service desc
 
 That's it ! You can see the full example source code here for the 
 
- - Proto message definition file :
- - Client Implementation : 
- - Server Implementation :
+ - .proto message definition file : [SearchMessages.proto](https://github.com/ppissias/xsrpcj-examples/blob/master/xsrpcj-simple/proto/SearchMessages.proto)
+ - Client Implementation : [SearchExampleServer.java](https://github.com/ppissias/xsrpcj-examples/blob/master/xsrpcj-simple/src/main/java/SearchExampleServer.java) 
+ - Server Implementation : [SearchExampleClient.java](https://github.com/ppissias/xsrpcj-examples/blob/master/xsrpcj-simple/src/main/java/SearchExampleClient.java)
 
   
 ## Examples
 
-Download the xsrpcj examples project which contains several examples on using xsrpcj and also examples that can be used to compare the performance of xsrpcj and grpc for the same services.
+Download the xsrpcj examples project (https://github.com/ppissias/xsrpcj-examples) which contains several examples on using xsrpcj and also examples that can be used to compare the performance of xsrpcj and grpc for the same services.
 
 
 ## Compiling
 
+ 
+after downloading the repository, go to the home directory and type
+
     mvn clean compile assembly:single
-will compile everything and assemble it as a single executable jar. You can then use the produced .jar file (see section below) in order to generate your RPC code.  You can also use it through ant and maven (see sections below)
+
+This command will compile everything and assemble it as a single executable jar. You can then use the produced .jar file (see section below) in order to generate your RPC code.  You can also use it through ant and maven (see sections below)
 
 ## Using the generator 
 The generator can be used in 2 ways: 
@@ -201,7 +206,7 @@ The generator can be used in 2 ways:
 
 Lets see both of them in detail: 
 
-**running the produced .jar (standalone or via ant / maven / ... ) ** : 
+**running the produced .jar (standalone or via ant / maven / ... )** : 
 
     java -jar xsrpcgen-1.0-SNAPSHOT-jar-with-dependencies.jar
     
@@ -298,5 +303,3 @@ This project is licensed under the GNU LESSER GENERAL PUBLIC LICENSE
   
 
 * Thanks of course to the protocol buffers developers, the velocity engine developers and the gson developers ! 
-
-
