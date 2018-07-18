@@ -162,13 +162,10 @@ public class XsRPCJGenerator {
 		//decode input
 		ServiceDescription servicesDesc = null;
 		try {
-			servicesDesc = ServiceConfigurationReader.parseSeviceConfigurationFile(jsonFile);
-			
-			//TODO
-			//do sanity check
+			servicesDesc = ServiceConfigurationReader.parseSeviceConfigurationFile(jsonFile);			
 		} catch (IOException e) {
 			logger.error("Cannot read json file:"+jsonFile);
-			return;
+			throw (e);
 		}
 
 
