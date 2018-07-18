@@ -1,6 +1,7 @@
 
 
 
+
 # xsrpcj
 
   
@@ -73,21 +74,27 @@ Services are described in a JSON file. A simple example is provided below:
 Services are grouped into Servers. Each server implements a set of services and listens on a specific TCP port.
 In the example above, we define 2 services realized by a server named "Persons". 
 
-Lets look closer at the service definition, each service has : 
+Lets look closer at the definition file, each **server** has : 
 
-- a **name** : to identify the server (this will be used for the generation of the name of the method in both the client and server APIs, in combination with the Server name)
+- a **name**, **port** and **javaPackage**: the name is used to identify the server (this will be used for the generation of the name of the method in both the client and server APIs, in combination with the service name) and the port will be the default listen port. The javaPackage is used to define the base package for the generated code.
 
-- a **request type**: This is the data type that is sent to the server when invoking the service (the request data)
+and each **service** definition has :
 
-- an **optional response type**: This is the data type we get back as a reply when invoking the service
+ - a **serviceName**: Used to identify the service 
 
-- an **optional callback type**: This is the data type we get back asynchronously from time to time as a result of invoking the service
+ - a **request type**: This is the data type that is sent to the server when invoking the service (the request data)
+
+ - an **optional response type**: This is the data type we get back as a reply when invoking the service
+
+ - an **optional callback type**: This is the data type we get back asynchronously from time to time as a result of invoking the service
 
   
 
-after invoking the xsrpcj code generator, we will get a server-side API and a client-side API. For the client-side we will get an interface & its implementation for each Server, which is all we need to start invoking services.
+after invoking the xsrpcj code generator, we will get a server-side API and a client-side API. 
+
 
 **Client Side**
+For the client-side we will get an interface & its implementation for each Server, which is all we need to start invoking services.
 
 For the example above we will get  a client side interface:
 
@@ -105,7 +112,7 @@ For the example above we will get  a client side interface:
 and its implementation (which implements the low level RPC and encoding stuff).  
 
 
-From the client side, the way to start invoking services is :
+The way to start invoking services is :
 
  
 		//get a service reference
@@ -204,7 +211,11 @@ The generator can be used in 2 ways:
 
 Lets see both of them in detail: 
 
-**running the produced .jar (standalone or via ant / maven / ... )** : 
+### running the produced .jar (standalone or via ant / maven / ... )
+First of all you need to define an environment variable pointing to the protoc compiler executable full path  (i.e. `PROTOC_PATH = /path/to/protoc` )
+
+Then you can invoke the code generator
+
 
     java -jar xsrpcgen-1.0-SNAPSHOT-jar-with-dependencies.jar
     
@@ -237,17 +248,101 @@ when you invoke the code generator with the following arguments:
         java -jar xsrpcgen-1.0-SNAPSHOT.jar -server -client -infrastructure src proto/service-desc.json 
 
 
-It will generate the required code for the server, client and the common infrastructure files (used for the low level communication). The infrastructure files are needed only once, so if you generate multiple services on the same application you do not need to generate them again and again. 
+It will generate the required code for the server, client and the common infrastructure files (used for the low level communication). The infrastructure files (`infrastructure` section in the JSON file) are needed only once, so if you generate multiple services on the same application you do not need to generate them again and again. 
 
-In detail it will generate: 
+It will generate all source code under the `src` directory according to the `proto/service-desc.json` service description.
 
- - org.xsrpcj.example.simple.comms package with all required classes (which are the common infrastructure for the client, server and the communication between them) 
- - org.xsrpcj.example.simple.client package with all the client generated code and interfaces
- - org.xsrpcj.example.simple.server with all the server generated code and interfaces 
- - org.xsrpcj.example.simple.types which contains some internal automatically generated data types. The generator generates and compiles its own little .proto file and the resulting types are generated in this package.
+**Generated files in detail**
 
-  
+Before the generation we started with the following file structure
 
+    
+    src
+	    main
+	        java
+	        |   |    SearchExampleClient.java 	- client logic (using the generated code)
+	        |   |    SearchExampleServer.java 	- server implementation (using the generated code)
+            |   org
+            |       xsrpcj
+            |           example
+            |               simple
+            |                       SearchMessages.java -generated by protoc from SearchMessages.proto 	           
+	        proto
+	                SearchMessages.proto		-our message definition file for the services
+	                service-desc.json 			-service description
+
+after invoking the generator as
+
+    java -jar xsrpcgen-1.0-SNAPSHOT.jar -server -client -infrastructure src proto/service-desc.json
+
+ we will have
+
+    src
+        main
+            java
+            |   |   SearchExampleClient.java
+            |   |   SearchExampleServer.java
+            |   |
+            |   org
+            |       xsrpcj
+            |           example
+            |               simple
+            |                   |   SearchMessages.java
+            |                   |
+            |                   client 										-Client generated code 
+            |                   |       PersonsClientService.java			-Client service interface
+            |                   |       PersonsClientServiceImpl.java 		-Client service implementation
+            |                   |       PersonsNotifyClientCallback.java 	-Client callback interface (to be implemented as a handler) 
+            |                   |
+            |                   comms										-Infrastructure code (low level RPC implementation) 
+            |                   |       ClientReplyHandler.java
+            |                   |       DataHandler.java
+            |                   |       ErrorHandler.java
+            |                   |       RemoteCommunicationsErrorType.java
+            |                   |       RemoteCommunicationsException.java
+            |                   |       ServiceProxy.java
+            |                   |       SocketDataTransceiver.java
+            |                   |       SocketDataTransceiverReaderThread.java
+            |                   |
+            |                   server										-Server Generated code
+            |                   |       PersonsClientHandler.java 			-Internal class handling client requests
+            |                   |       PersonsNotifyServerCallback.java	-Server callback interface (implementations of this interface are provided in method calls)
+            |                   |       PersonsServer.java					-The class we use to start the server 
+            |                   |       PersonsServerService.java			-The Server service interface, needs to be implemented in order to define the logic of our services 
+            |                   |
+            |                   types										-Internal data types
+            |                           Persons.java 						-Generated Data types from PersonsMessageContainer.proto
+            |
+            proto
+                    PersonsMessageContainer.proto 							-Generated (and compiled) internal .proto file. It contains an envelope (packet) that carries the messages from our services
+                    SearchMessages.proto
+                    service-desc.json
+
+
+You can navigate the example source code to see the content of the files in detail.  
+You don't need to know the contents of each file, you are guided in what you need to implement by trying to use the client and server side code. 
+
+**On the client side**
+when you try to use the generated code in order to invoke services, for example: 
+
+    PersonsClientService serverRef = new PersonsClientServiceImpl( ... ) 
+    serverRef.search( ... ) 
+you will notice that the constructor of the service implementation (`PersonsClientServiceImpl`):
+
+    PersonsClientServiceImpl(String host, PersonsNotifyClientCallback clientnotifyCallback)
+requires a callback handler (`PersonsNotifyClientCallback`) that you need to implement. 
+ 
+**On the server side** 
+when you try to start the server: 
+
+    new PersonsServer( ...).start()
+
+  you will notice that the constructor of the `PersonsServer` :
+
+      public PersonsServer(PersonsServerService serviceHandler)
+requires an implementation of the `PersonsServerService` , which defines the service logic. 
+
+In this example, these are the only things you need to do. 
   
 ## Maven and ant integration 
 
@@ -271,8 +366,42 @@ Below is a simple ant task that calls the generator
 	</target>
 
 ### Maven integration 
- ... comming soon ...
 
+	<properties>
+	    <project.build.sourceProtoDirectory>${project.basedir}/src/main/proto</project.build.sourceProtoDirectory>	
+	</properties>
+
+	<build>
+		<sourceDirectory>src/main/java</sourceDirectory>
+		.... 
+
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>exec-maven-plugin</artifactId>
+					<version>1.6.0</version>
+					<executions>
+
+						<!--  generate RPC java code and compile generated .proto file with the xsrpcj generator-->
+						<execution>
+							<id>generate RPC stubs</id>
+							<phase>generate-sources</phase>
+							<configuration>
+								<mainClass>org.xsrpcj.gen.XsRPCJGenerator</mainClass>
+								<arguments>
+									<argument>-server</argument>
+									<argument>-client</argument>
+									<argument>-infrastructure</argument>
+									<argument>${project.build.sourceDirectory}</argument>
+									<argument>${project.build.sourceProtoDirectory}/service-desc.json</argument>
+								</arguments>
+							</configuration>
+							<goals>
+								<goal>java</goal>
+							</goals>
+						</execution>
+
+					</executions>
+				</plugin>
   
 
 
