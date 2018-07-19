@@ -2,6 +2,7 @@
 
 
 
+
 # xsrpcj
 
   
@@ -28,7 +29,7 @@ xsrpcj focuses on a **simple programming model** and **minimal dependencies**. I
 
 ## Getting Started
 
-  
+*A good way to start is to check out the xsrpcj examples project (https://github.com/ppissias/xsrpcj-examples) -also check the wiki*  
 
 OK, so you have in mind some **services** you want to **implement**. You need to **express** these services in terms of **interaction patterns** and create the **data types** for the various requests replies and possible callbacks. A **typical workflow** using xsrpcj is:
 
