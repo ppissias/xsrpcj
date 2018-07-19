@@ -7,7 +7,7 @@
 
   
 
-**xsrpcj** is an extra small (xs) and ultra fast remote procedure call (rpc) implementation for java on top of TCP Sockets, It is designed to be used with **protocol buffers** generated data types but it can also use custom data types. It supports 3 interaction patterns:
+**xsrpcj** is an extra small (xs) remote procedure call (rpc) implementation for java on top of TCP Sockets, It is designed to be used with **protocol buffers** generated data types but it can also use custom data types. It supports 3 interaction patterns:
 
   
 
