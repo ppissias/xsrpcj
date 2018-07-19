@@ -1,8 +1,4 @@
 
-
-
-
-
 # xsrpcj
 
   
@@ -324,6 +320,7 @@ You can navigate the example source code to see the content of the files in deta
 You don't need to know the contents of each file, you are guided in what you need to implement by trying to use the client and server side code. 
 
 **On the client side**
+
 when you try to use the generated code in order to invoke services, for example: 
 
     PersonsClientService serverRef = new PersonsClientServiceImpl( ... ) 
@@ -334,6 +331,7 @@ you will notice that the constructor of the service implementation (`PersonsClie
 requires a callback handler (`PersonsNotifyClientCallback`) that you need to implement. 
  
 **On the server side** 
+
 when you try to start the server: 
 
     new PersonsServer( ...).start()
@@ -344,6 +342,22 @@ when you try to start the server:
 requires an implementation of the `PersonsServerService` , which defines the service logic. 
 
 In this example, these are the only things you need to do. 
+
+### running invoking the generator programatically
+you can invoke the generator by calling the static method
+
+    XsRPCJGenerator.generate
+which takes the following arguments:
+
+    public synchronized static void generate(
+	    boolean generateClientFiles,  //same as -client : indicating if we will generate the client code
+	    boolean generateServerFiles, //same as -server : indicating if we will generate the server code
+    	boolean generateInfrastructureFiles, //same as -infrastructure : indicating if we will generate the infrastructure code
+    	String jsonFile,  //full or relative path to the service description JSON file
+    	String sourcePath, //the source path top level directory, where all source code will be generated, i.e. /path/to/src 
+    	String protocPath //the full path to the protoc executable 
+    	)
+
   
 ## Maven and ant integration 
 
@@ -351,7 +365,21 @@ In this example, these are the only things you need to do.
 ### Ant integration
 Below is a simple ant task that calls the generator
 
-	<target name="generateRPC" depends="cleanRPC, generateProtobuf">		
+	<property name="src.dir" location="src" />
+	<property name="proto.src.dir" location="proto" />	
+
+	<!-- define classpath -->
+	<path id="compile.rpc.classpath"> 
+		<fileset dir="/path/to/proto"> <!-- protoc jars -->
+				<include name="*.jar" />
+		</fileset>	
+		<fileset dir="/path/to/xsrpcj"> <!-- xsrpc generator jar with dependencies -->
+				<include name="*.jar" />
+		</fileset>			
+	</path>
+	
+	<!-- define target-->
+	<target name="generateRPC">		
 		<java classname="org.xsrpc.gen.XsRPCJGenerator" fork="true">
 		
 		  	<arg value="-server"/>
@@ -361,10 +389,11 @@ Below is a simple ant task that calls the generator
 			<arg value="${proto.src.dir}/service-desc.json"/>
 			
 			<classpath>
-				<path refid="compile.rpc.classpath" /> <!-- here you need to have the generator jar in your classpath -->
+				<path refid="compile.rpc.classpath" /> 
 			</classpath>
 		</java>
 	</target>
+
 
 ### Maven integration 
 
