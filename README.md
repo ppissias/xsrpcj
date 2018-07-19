@@ -316,7 +316,7 @@ after invoking the generator as
                     service-desc.json
 
 
-You can navigate the example source code to see the content of the files in detail.  
+You can navigate the [example source code](https://github.com/ppissias/xsrpcj-examples/tree/master/xsrpcj-simple) to see the content of the files in detail.  
 You don't need to know the contents of each file, you are guided in what you need to implement by trying to use the client and server side code. 
 
 **On the client side**
