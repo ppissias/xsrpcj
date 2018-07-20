@@ -191,7 +191,7 @@ You can see the full example source code here for the
   
 ## Examples
 
-Download the xsrpcj examples project (https://github.com/ppissias/xsrpcj-examples) which contains several examples on using xsrpcj and also examples that can be used to compare the performance of xsrpcj and grpc for the same services.
+Download the xsrpcj examples project (https://github.com/ppissias/xsrpcj-examples) which contains several examples on using xsrpcj.
 
 
 ## Compiling
@@ -214,7 +214,7 @@ The generator can be used in 2 ways:
 Lets see both of them in detail: 
 
 ### running the produced .jar (standalone or via ant / maven / ... )
-First of all you need to define an environment variable pointing to the protoc compiler executable full path  (i.e. `PROTOC_PATH = /path/to/protoc` )
+First of all you need to define an environment variable named `PROTOC_PATH` pointing to the protoc compiler executable full path  (i.e. `PROTOC_PATH = /path/to/protoc` )
 
 Then you can invoke the code generator
 
@@ -291,12 +291,12 @@ after invoking the generator as
             |               simple
             |                   |   SearchMessages.java
             |                   |
-            |                   client 										-Client generated code 
-            |                   |       PersonsClientService.java			-Client service interface
-            |                   |       PersonsClientServiceImpl.java 		-Client service implementation
-            |                   |       PersonsNotifyClientCallback.java 	-Client callback interface (to be implemented as a handler) 
+            |                   client												-Client generated code 
+            |                   |       PersonsClientService.java				-Client service interface
+            |                   |       PersonsClientServiceImpl.java		-Client service implementation
+            |                   |       PersonsNotifyClientCallback.java	-Client callback interface (to be implemented as a handler) 
             |                   |
-            |                   comms										-Infrastructure code (low level RPC implementation) 
+            |                   comms													-Infrastructure code (low level RPC implementation) 
             |                   |       ClientReplyHandler.java
             |                   |       DataHandler.java
             |                   |       ErrorHandler.java
@@ -306,17 +306,17 @@ after invoking the generator as
             |                   |       SocketDataTransceiver.java
             |                   |       SocketDataTransceiverReaderThread.java
             |                   |
-            |                   server										-Server Generated code
-            |                   |       PersonsClientHandler.java 			-Internal class handling client requests
+            |                   server												-Server Generated code
+            |                   |       PersonsClientHandler.java				-Internal class handling client requests
             |                   |       PersonsNotifyServerCallback.java	-Server callback interface (implementations of this interface are provided in method calls)
-            |                   |       PersonsServer.java					-The class we use to start the server 
-            |                   |       PersonsServerService.java			-The Server service interface, needs to be implemented in order to define the logic of our services 
+            |                   |       PersonsServer.java						-The class we use to start the server 
+            |                   |       PersonsServerService.java				-The Server service interface, needs to be implemented in order to define the logic of our services 
             |                   |
-            |                   types										-Internal data types
-            |                           Persons.java 						-Generated Data types from PersonsMessageContainer.proto
+            |                   types													-Internal data types
+            |                           Persons.java								-Generated Data types from PersonsMessageContainer.proto
             |
             proto
-                    PersonsMessageContainer.proto 							-Generated (and compiled) internal .proto file. It contains an envelope (packet) that carries the messages from our services
+                    PersonsMessageContainer.proto									-Generated (and compiled) internal .proto file. It contains an envelope (packet) that carries the messages from our services
                     SearchMessages.proto
                     service-desc.json
 
@@ -324,7 +324,7 @@ after invoking the generator as
 You can navigate the [example source code](https://github.com/ppissias/xsrpcj-examples/tree/master/xsrpcj-simple) to see the content of the files in detail.  
 You don't need to know the contents of each file, you are guided in what you need to implement by trying to use the client and server side code. 
 
-**On the client side**
+### Implementing the client side
 
 when you try to use the generated code in order to invoke services, for example: 
 
@@ -335,7 +335,7 @@ you will notice that the constructor of the service implementation (`PersonsClie
     PersonsClientServiceImpl(String host, PersonsNotifyClientCallback clientnotifyCallback)
 requires a callback handler (`PersonsNotifyClientCallback`) that you need to implement. 
  
-**On the server side** 
+### Implementing the server side
 
 when you try to start the server: 
 
@@ -448,9 +448,6 @@ Please read feel free to extend the project!
 
   
 
-
-  
-
 ## License
 
   
@@ -464,4 +461,4 @@ This project is licensed under the GNU LESSER GENERAL PUBLIC LICENSE
 
   
 
-* Thanks of course to the protocol buffers developers, the velocity engine developers and the gson developers ! 
+* Thanks to the protocol buffers developers, the velocity engine developers and the gson developers ! 
