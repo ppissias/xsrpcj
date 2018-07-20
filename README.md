@@ -291,12 +291,12 @@ after invoking the generator as
             |               simple
             |                   |   SearchMessages.java
             |                   |
-            |                   client												-Client generated code 
-            |                   |       PersonsClientService.java				-Client service interface
-            |                   |       PersonsClientServiceImpl.java		-Client service implementation
+            |                   client	-Client generated code 
+            |                   |       PersonsClientService.java		-Client service interface
+            |                   |       PersonsClientServiceImpl.java	-Client service implementation
             |                   |       PersonsNotifyClientCallback.java	-Client callback interface (to be implemented as a handler) 
             |                   |
-            |                   comms													-Infrastructure code (low level RPC implementation) 
+            |                   comms		-Infrastructure code (low level RPC implementation) 
             |                   |       ClientReplyHandler.java
             |                   |       DataHandler.java
             |                   |       ErrorHandler.java
@@ -306,17 +306,17 @@ after invoking the generator as
             |                   |       SocketDataTransceiver.java
             |                   |       SocketDataTransceiverReaderThread.java
             |                   |
-            |                   server												-Server Generated code
-            |                   |       PersonsClientHandler.java				-Internal class handling client requests
+            |                   server	-Server Generated code
+            |                   |       PersonsClientHandler.java		-Internal class handling client requests
             |                   |       PersonsNotifyServerCallback.java	-Server callback interface (implementations of this interface are provided in method calls)
-            |                   |       PersonsServer.java						-The class we use to start the server 
-            |                   |       PersonsServerService.java				-The Server service interface, needs to be implemented in order to define the logic of our services 
+            |                   |       PersonsServer.java	-The class we use to start the server 
+            |                   |       PersonsServerService.java		-The Server service interface, needs to be implemented in order to define the logic of our services 
             |                   |
-            |                   types													-Internal data types
-            |                           Persons.java								-Generated Data types from PersonsMessageContainer.proto
+            |                   types		-Internal data types
+            |                           Persons.java	-Generated Data types from PersonsMessageContainer.proto
             |
             proto
-                    PersonsMessageContainer.proto									-Generated (and compiled) internal .proto file. It contains an envelope (packet) that carries the messages from our services
+                    PersonsMessageContainer.proto	-Generated (and compiled) internal .proto file. It contains an envelope (packet) that carries the messages from our services
                     SearchMessages.proto
                     service-desc.json
 
