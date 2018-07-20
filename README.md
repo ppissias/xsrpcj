@@ -97,9 +97,9 @@ For the example above we will get  a client side interface:
 
     public interface PersonsClientService {
 
-	public SearchPersonResponse search(SearchPersonRequest request) throws RemoteCommunicationsException;		
+		public SearchPersonResponse search(SearchPersonRequest request) throws RemoteCommunicationsException;		
 		
-	public PersonNotificationResponse notify(PersonNotificationRequest request) throws RemoteCommunicationsException;
+		public PersonNotificationResponse notify(PersonNotificationRequest request) throws RemoteCommunicationsException;
 	}		
 		
 
@@ -125,11 +125,12 @@ The way to start invoking services is :
 		PersonNotificationResponse notResp = serverRef.notify(....);
 
 					
-Notice that we need to pass a "callback handler" (`cbHandler`) when we instantiate `ExampleClientServiceImpl` ? We need to do this for each service that implements a callback. This is needed because we need to provide a handler for the asynchronous callback messages. 
+Notice that we need to pass a "callback handler" (`cbHandler`) when we instantiate `ExampleClientServiceImpl`. We need to do this for each service that implements a callback, as we need to provide a handler for the asynchronous callback messages. 
 
 So if we used no services with callbacks, the constructor would not need a callback handler and if we used 10 services with callbacks, the constructor would need 10 callback handlers, one for each service. 
 
 In our particular case, we only have 1 service with a callback, so we need to provide just 1 callback handler. 
+
 The callback handler needs to implement an interface which defines a method able to process the callback  messages. In our particular example it looks like:
 
     public interface PersonsNotifyClientCallback {
@@ -139,7 +140,7 @@ The callback handler needs to implement an interface which defines a method able
 
 The naming convention comes from the Server and Service name descriptions, which can be as small and simple as you like, or long if you like detailed names.     
 
-Besides the callback, we pass an additional argument, `serverHost`which is the host where the service is implemented (we can also pass a port argument, if the server listens on a different port than the default)
+Besides the callback, we pass an additional argument, `serverHost` which is the host where the service is implemented (we can also pass a port argument, if the server listens on a different port than the default)
 
     ExampleClientService serverRefDefaultPort = new ExampleClientServiceImpl("localhost", cbHandler);
     	
@@ -164,6 +165,7 @@ On the server side, we of course need to start the server.
 		//new PersonsServer(serviceImplementation, 22123).start();
 
 We can use the default port, or use a custom port by invoking another constructor. Everything is automatically generated except the `serviceImplementation`, which is the actual implementation of your service. 
+
 Lets look at the generated interface that you need to implement. 
 
     public interface PersonsServerService {
@@ -173,7 +175,7 @@ Lets look at the generated interface that you need to implement.
 		public PersonNotificationResponse notify(PersonNotificationRequest request, PersonsNotifyServerCallback callback);	
 	}
 		
-}
+
 		
 It is the kind of interface that you would expect, according to the service description. Notice that you receive a callback object on method `notify` that you can use in order to send asynchronously responses to the caller. The underlying implementation is automatically generated and will route back the reply to the client callback handler on the client side. 
 
