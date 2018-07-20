@@ -47,7 +47,7 @@ Lets take it **step by step**.
 
   
 
-### Service Description
+### Service description
 
 Services are described in a JSON file. A simple example is provided below:
 
@@ -86,11 +86,13 @@ and each **service** definition has :
  - an **optional callback type**: This is the data type we get back asynchronously from time to time as a result of invoking the service
 
   
+### Code generation
 
-after invoking the xsrpcj code generator, we will get a server-side API and a client-side API. 
+after invoking the xsrpcj code generator for a service description file, we will get a server-side API and a client-side API. 
 
 
-**Client Side**
+**Client Side API**
+
 For the client-side we will get an interface & its implementation for each Server, which is all we need to start invoking services.
 
 For the example above we will get  a client side interface:
@@ -127,8 +129,6 @@ The way to start invoking services is :
 					
 Notice that we need to pass a "callback handler" (`cbHandler`) when we instantiate `ExampleClientServiceImpl`. We need to do this for each service that implements a callback, as we need to provide a handler for the asynchronous callback messages. 
 
-So if we used no services with callbacks, the constructor would not need a callback handler and if we used 10 services with callbacks, the constructor would need 10 callback handlers, one for each service. 
-
 In our particular case, we only have 1 service with a callback, so we need to provide just 1 callback handler. 
 
 The callback handler needs to implement an interface which defines a method able to process the callback  messages. In our particular example it looks like:
@@ -149,7 +149,7 @@ Even though the service description already has a predefined port, on the client
     ExampleClientService serverRef = new ExampleClientServiceImpl("localhost", 22100, cbHandler);
     
 
-**Server side**
+**Server side API**
   
 On the server side, we of course need to start the server. 
 
@@ -179,9 +179,12 @@ Lets look at the generated interface that you need to implement.
 		
 It is the kind of interface that you would expect, according to the service description. Notice that you receive a callback object on method `notify` that you can use in order to send asynchronously responses to the caller. The underlying implementation is automatically generated and will route back the reply to the client callback handler on the client side. 
 
-That's it ! You can see the full example source code here for the 
+That's it ! 
 
- - .proto message definition file : [SearchMessages.proto](https://github.com/ppissias/xsrpcj-examples/blob/master/xsrpcj-simple/proto/SearchMessages.proto)
+You can see the full example source code here for the 
+
+ - .proto message definition file : [SearchMessages.proto](https://github.com/ppissias/xsrpcj-examples/blob/master/xsrpcj-simple/src/main/proto/SearchMessages.proto)
+  - service description file : [service-desc.json](https://github.com/ppissias/xsrpcj-examples/blob/master/xsrpcj-simple/src/main/proto/service-desc.json)
  - Client Implementation : [SearchExampleServer.java](https://github.com/ppissias/xsrpcj-examples/blob/master/xsrpcj-simple/src/main/java/SearchExampleServer.java) 
  - Server Implementation : [SearchExampleClient.java](https://github.com/ppissias/xsrpcj-examples/blob/master/xsrpcj-simple/src/main/java/SearchExampleClient.java)
 
