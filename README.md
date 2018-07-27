@@ -450,8 +450,9 @@ Please read feel free to extend the project!
 
   
 
-This project is licensed under the GNU LESSER GENERAL PUBLIC LICENSE
-                       Version 3, - see the [LICENSE](LICENSE) file for details
+This project is licensed under the MIT License (https://opensource.org/licenses/MIT)
+- see the [LICENSE](LICENSE) file for details
+
 
   
 

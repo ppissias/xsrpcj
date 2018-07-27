@@ -14,6 +14,7 @@ import org.apache.velocity.runtime.RuntimeConstants;
 import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xsrpcj.gen.ServiceConfigurationReader.Infrastructure;
 import org.xsrpcj.gen.ServiceConfigurationReader.Server;
 import org.xsrpcj.gen.ServiceConfigurationReader.Service;
 import org.xsrpcj.gen.ServiceConfigurationReader.ServiceDescription;
@@ -85,6 +86,7 @@ public class XsRPCJGenerator {
 	}
 
 	/**
+	 * Main entry point
 	 * @param args
 	 * @throws Exception 
 	 */
@@ -168,7 +170,8 @@ public class XsRPCJGenerator {
 			throw (e);
 		}
 
-
+		//do some basic checks on the service information
+		doSanityCheck(servicesDesc);
 		
 		//set initial context
 		velocityContext.put("infrastructure", servicesDesc.getInfrastructure());
@@ -224,6 +227,106 @@ public class XsRPCJGenerator {
 		
 	}
 
+
+
+	/**
+	 * Does a basic sanity check on the provided information
+	 * @param servicesDesc the service description information
+	 */
+	private void doSanityCheck(ServiceDescription servicesDesc) throws ServiceDescriptionException  {
+		//make some basic checks for each server
+
+		List<String> serverNames = new ArrayList<String>();
+		
+		if (servicesDesc.getServers() == null) {
+			throw new ServiceDescriptionException("No servers detected");
+			
+		} else if (servicesDesc.getServers().size() == 0) {
+			throw new ServiceDescriptionException("No servers detected");			
+		}
+		
+		for (Server server : servicesDesc.getServers()) {
+			
+			if (server.getName() == null) {
+				throw new ServiceDescriptionException("Detected server without a name. Servers must always have a name property");
+			} else if (server.getName().equals("")){
+				throw new ServiceDescriptionException("Detected server with an empty name. Servers must always have a non empty name property");
+			}
+
+			//check for server name duplication
+			if (serverNames.contains(server.getName())) {
+				//duplicate name
+				throw new ServiceDescriptionException("Detected duplicate server name. Servers must have a unique name");				
+			} else {
+				//add to names
+				serverNames.add(server.getName());
+			}
+			
+			if (server.getPort() <= 0) {
+				throw new ServiceDescriptionException("Detected server without a port. Servers must always have a port property with a value of a positive integer");
+			}
+			
+			if (server.getJavaPackage() == null) {
+				throw new ServiceDescriptionException("Detected server without a java package. Servers must always have a javaPackage property");
+			} else if (server.getJavaPackage().equals("")){
+				throw new ServiceDescriptionException("Detected server with an empty java package. Servers must always have a non empty javaPackage property");
+			}	
+			
+			//for each service
+			List<String> serviceNames = new ArrayList<String>();
+
+			if (server.getServices() == null) {
+				throw new ServiceDescriptionException("No services detected for server "+server.getName());
+				
+			} else if (server.getServices().size() == 0) {
+				throw new ServiceDescriptionException("No services detected for server "+server.getName());
+			}
+			
+			for (Service service : server.getServices()) {
+
+				if (service.getServiceName() == null) {
+					throw new ServiceDescriptionException("Detected service without a service name on server "+server.getName()+". Services must always have a serviceName property");
+				} else if (service.getServiceName().equals("")){
+					throw new ServiceDescriptionException("Detected service without a service name on server "+server.getName()+". Services must always have a serviceName property");
+				}
+
+				//check for service name duplication
+				if (serviceNames.contains(service.getServiceName())) {
+					//duplicate name
+					throw new ServiceDescriptionException("Detected duplicate service name on server "+server.getName()+". Services must have a unique name per server");				
+				} else {
+					//add to names
+					serviceNames.add(service.getServiceName());
+				}
+				
+				if (service.getRequestType() == null) {
+					throw new ServiceDescriptionException("Detected service without a request type on server "+server.getName()+". Services must always have a requestType property");
+				} else if (service.getRequestType().equals("")){
+					throw new ServiceDescriptionException("Detected service without a request type on server "+server.getName()+". Services must always have a requestType property");
+				}
+				
+				
+			}
+		}
+		
+		Infrastructure infrastructurePart = servicesDesc.getInfrastructure();
+
+		if (infrastructurePart == null) {
+			throw new ServiceDescriptionException("Infrastructure part is missing");
+		} 
+
+		if (infrastructurePart.getJavaPackage() == null) {
+			throw new ServiceDescriptionException("Infrastructure java package not found. The infrastructure part must have a javaPackage property");
+		} else if (infrastructurePart.getJavaPackage().equals("")){
+			throw new ServiceDescriptionException("Infrastructure java package not found. The infrastructure part must have a non empty javaPackage property");
+		}
+		
+		if (infrastructurePart.getLogging() == null) {
+			throw new ServiceDescriptionException("Infrastructure logging not found. The infrastructure part must have a logging property");
+		} else if (infrastructurePart.getLogging().equals("")){
+			throw new ServiceDescriptionException("Infrastructure logging not found. The infrastructure part must have a non empty logging property");
+		}		
+	}
 
 	/**
 	 * Generates the infrastructure files
