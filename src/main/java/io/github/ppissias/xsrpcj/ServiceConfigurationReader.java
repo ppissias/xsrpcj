@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.xsrpcj.gen;
+package io.github.ppissias.xsrpcj;
 
 import java.io.IOException;
 import java.nio.file.Files;

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.xsrpcj.gen;
+package io.github.ppissias.xsrpcj;
 
 /**
  * Simple exception for service description issues

@@ -1,4 +1,5 @@
 
+
 # xsrpcj
 
   
@@ -56,10 +57,10 @@ Services are described in a JSON file. A simple example is provided below:
 	 	{
 			"name": "Persons",
 			"port": "22100",
-			"javaPackage":"org.xsrpcj.example.simple",
+			"javaPackage":"io.github.ppissias.xsrpcj.example.simple",
 			"services":[
-				{"serviceName":"search", "requestType":"org.xsrpcj.example.simple.SearchMessages.SearchPersonRequest", "responseType":"org.xsrpcj.example.simple.SearchMessages.SearchPersonResponse" },
-				{"serviceName":"notify", "requestType":"org.xsrpcj.example.simple.SearchMessages.PersonNotificationRequest", "responseType":"org.xsrpcj.example.simple.SearchMessages.PersonNotificationResponse" , "callbackType":"org.xsrpcj.example.simple.SearchMessages.SearchPersonResponse" }
+				{"serviceName":"search", "requestType":"io.github.ppissias.xsrpcj.example.simple.SearchMessages.SearchPersonRequest", "responseType":"io.github.ppissias.xsrpcj.example.simple.SearchMessages.SearchPersonResponse" },
+				{"serviceName":"notify", "requestType":"io.github.ppissias.xsrpcj.example.simple.SearchMessages.PersonNotificationRequest", "responseType":"io.github.ppissias.xsrpcj.example.simple.SearchMessages.PersonNotificationResponse" , "callbackType":"io.github.ppissias.xsrpcj.example.simple.SearchMessages.SearchPersonResponse" }
 			]
 		}		
 	]
@@ -201,7 +202,10 @@ after downloading the repository, go to the home directory and type
 
     mvn clean compile assembly:single
 
-This command will compile everything and assemble it as a single executable jar. You can then use the produced .jar file (see section below) in order to generate your RPC code.  You can also use it through ant and maven (see sections below)
+This command will compile everything and assemble it as a single executable jar. You can then use the produced .jar file (see section below) in order to generate your RPC code.  You can also use it through ant and maven (see sections below).
+If you plan to use the generator via Maven, then optionally you can compile it for your local repository
+
+    mvn clean install
 
 ## Using the generator 
 The generator can be used in 2 ways: 
@@ -211,9 +215,9 @@ The generator can be used in 2 ways:
  - programatically by invoking a static method
  
 
-Lets see both of them in detail: 
+Lets see all of them in detail: 
 
-### running the produced .jar (standalone or via ant / maven / ... )
+### running the produced .jar manually
 First of all you need to define an environment variable named `PROTOC_PATH` pointing to the protoc compiler executable full path  (i.e. `PROTOC_PATH = /path/to/protoc` )
 
 Then you can invoke the code generator
@@ -222,7 +226,10 @@ Then you can invoke the code generator
     java -jar xsrpcgen-1.0-SNAPSHOT-jar-with-dependencies.jar
     
     expected arguments: [-client] [-server] [-infrastructure] <source generation path> <service-description-file>
+
+**No matter how you invoke the generator (manually, programatically, maven, ant, ...) the following example usage applies. There are examples on how to invoke the generator programmatically and via ant / maven in the next sections.**
     
+### Example Usage
 for example assuming that you have the following service description file in `proto/service-description.json`
 
     {
@@ -230,15 +237,15 @@ for example assuming that you have the following service description file in `pr
 	 	{
 			"name": "Persons",
 			"port": "22100",
-			"javaPackage":"org.xsrpcj.example.simple",
+			"javaPackage":"io.github.ppissias.xsrpcj.example.simple",
 			"services":[
-				{"serviceName":"search", "requestType":"org.xsrpcj.example.simple.SearchMessages.SearchPersonRequest", "responseType":"org.xsrpcj.example.simple.SearchMessages.SearchPersonResponse" },
-				{"serviceName":"notify", "requestType":"org.xsrpcj.example.simple.SearchMessages.PersonNotificationRequest", "responseType":"org.xsrpcj.example.simple.SearchMessages.PersonNotificationResponse" , "callbackType":"org.xsrpcj.example.simple.SearchMessages.SearchPersonResponse" }
+				{"serviceName":"search", "requestType":"io.github.ppissias.xsrpcj.example.simple.SearchMessages.SearchPersonRequest", "responseType":"io.github.ppissias.xsrpcj.example.simple.SearchMessages.SearchPersonResponse" },
+				{"serviceName":"notify", "requestType":"io.github.ppissias.xsrpcj.example.simple.SearchMessages.PersonNotificationRequest", "responseType":"io.github.ppissias.xsrpcj.example.simple.SearchMessages.PersonNotificationResponse" , "callbackType":"io.github.ppissias.xsrpcj.example.simple.SearchMessages.SearchPersonResponse" }
 			]
 		}		
 	], 
 	"infrastructure" : {
-		"javaPackage":"org.xsrpcj.example.simple.comms",
+		"javaPackage":"io.github.ppissias.xsrpcj.example.simple.comms",
 		"logging":"System"
 	}
 	}	 
@@ -264,11 +271,13 @@ Before the generation we started with the following file structure
 	        java
 	        |   |    SearchExampleClient.java 	- client logic (using the generated code)
 	        |   |    SearchExampleServer.java 	- server implementation (using the generated code)
-            |   org
-            |       xsrpcj
-            |           example
-            |               simple
-            |                       SearchMessages.java -generated by protoc from SearchMessages.proto 	           
+            |   io
+            |   	github
+            |   		ppissias                        
+            |       		xsrpcj
+            |           		example
+            |               		simple
+            |                       	SearchMessages.java -generated by protoc from SearchMessages.proto 	           
 	        proto
 	                SearchMessages.proto		-our message definition file for the services
 	                service-desc.json 			-service description
@@ -285,35 +294,37 @@ after invoking the generator as
             |   |   SearchExampleClient.java
             |   |   SearchExampleServer.java
             |   |
-            |   org
-            |       xsrpcj
-            |           example
-            |               simple
-            |                   |   SearchMessages.java
-            |                   |
-            |                   client	-Client generated code 
-            |                   |       PersonsClientService.java		-Client service interface
-            |                   |       PersonsClientServiceImpl.java	-Client service implementation
-            |                   |       PersonsNotifyClientCallback.java	-Client callback interface (to be implemented as a handler) 
-            |                   |
-            |                   comms		-Infrastructure code (low level RPC implementation) 
-            |                   |       ClientReplyHandler.java
-            |                   |       DataHandler.java
-            |                   |       ErrorHandler.java
-            |                   |       RemoteCommunicationsErrorType.java
-            |                   |       RemoteCommunicationsException.java
-            |                   |       ServiceProxy.java
-            |                   |       SocketDataTransceiver.java
-            |                   |       SocketDataTransceiverReaderThread.java
-            |                   |
-            |                   server	-Server Generated code
-            |                   |       PersonsClientHandler.java		-Internal class handling client requests
-            |                   |       PersonsNotifyServerCallback.java	-Server callback interface (implementations of this interface are provided in method calls)
-            |                   |       PersonsServer.java	-The class we use to start the server 
-            |                   |       PersonsServerService.java		-The Server service interface, needs to be implemented in order to define the logic of our services 
-            |                   |
-            |                   types		-Internal data types
-            |                           Persons.java	-Generated Data types from PersonsMessageContainer.proto
+            |   io
+            |   	github
+            |   		ppissias                        
+            |       		xsrpcj
+            |           		example
+            |               		simple
+            |                   		|   SearchMessages.java
+            |                  			|
+            |                   	client	-Client generated code 
+            |                   		|       PersonsClientService.java		-Client service interface
+            |                   		|       PersonsClientServiceImpl.java	-Client service implementation
+            |                   		|       PersonsNotifyClientCallback.java	-Client callback interface (to be implemented as a handler) 
+            |                   		|
+            |                   	comms		-Infrastructure code (low level RPC implementation) 
+            |                   		|       ClientReplyHandler.java
+            |                   		|       DataHandler.java
+            |                   		|       ErrorHandler.java
+            |                   		|       RemoteCommunicationsErrorType.java
+            |                   		|       RemoteCommunicationsException.java
+            |                   		|       ServiceProxy.java
+            |                   		|       SocketDataTransceiver.java
+            |                   		|       SocketDataTransceiverReaderThread.java
+            |                   		|
+            |                   	server	-Server Generated code
+            |                   		|       PersonsClientHandler.java		-Internal class handling client requests
+            |                   		|       PersonsNotifyServerCallback.java	-Server callback interface (implementations of this interface are provided in method calls)
+            |                   		|       PersonsServer.java	-The class we use to start the server 
+            |                   		|       PersonsServerService.java		-The Server service interface, needs to be implemented in order to define the logic of our services 
+            |                   		|
+            |                   	types		-Internal data types
+            |                           		Persons.java	-Generated Data types from PersonsMessageContainer.proto
             |
             proto
                     PersonsMessageContainer.proto	-Generated (and compiled) internal .proto file. It contains an envelope (packet) that carries the messages from our services
@@ -375,9 +386,6 @@ Below is a simple ant task that calls the generator
 
 	<!-- define classpath -->
 	<path id="compile.rpc.classpath"> 
-		<fileset dir="/path/to/proto"> <!-- protoc jars -->
-				<include name="*.jar" />
-		</fileset>	
 		<fileset dir="/path/to/xsrpcj"> <!-- xsrpc generator jar with dependencies -->
 				<include name="*.jar" />
 		</fileset>			
@@ -385,7 +393,7 @@ Below is a simple ant task that calls the generator
 	
 	<!-- define target-->
 	<target name="generateRPC">		
-		<java classname="org.xsrpc.gen.XsRPCJGenerator" fork="true">
+		<java classname="io.github.ppissias.xsrpcj.XsRPCJGenerator" fork="true">
 		
 		  	<arg value="-server"/>
 			<arg value="-client"/>
@@ -400,12 +408,29 @@ Below is a simple ant task that calls the generator
 	</target>
 
 
-### Maven integration 
+### Maven integration
 
+You can check the examples (https://github.com/ppissias/xsrpcj-examples) in order to see a pom.xml that uses xsrpcj.
+
+In short:  
+
+	
 	<properties>
 	    <project.build.sourceProtoDirectory>${project.basedir}/src/main/proto</project.build.sourceProtoDirectory>	
 	</properties>
 
+	<dependencies>
+	
+		<dependency>
+			<groupId>io.github.ppissias</groupId>
+			<artifactId>xsrpcj</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+
+		...
+		
+	</dependencies>
+	
 	<build>
 		<sourceDirectory>src/main/java</sourceDirectory>
 		.... 
@@ -421,7 +446,7 @@ Below is a simple ant task that calls the generator
 							<id>generate RPC stubs</id>
 							<phase>generate-sources</phase>
 							<configuration>
-								<mainClass>org.xsrpcj.gen.XsRPCJGenerator</mainClass>
+								<mainClass>io.github.ppissias.xsrpcj.XsRPCJGenerator</mainClass>
 								<arguments>
 									<argument>-server</argument>
 									<argument>-client</argument>
@@ -463,3 +488,4 @@ This project is licensed under the MIT License (https://opensource.org/licenses/
   
 
 * Thanks to the protocol buffers developers, the velocity engine developers and the gson developers ! 
+
