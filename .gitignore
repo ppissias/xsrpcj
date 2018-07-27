@@ -6,3 +6,4 @@ target
 /.settings
 /target
 /.classpath
+*.asc
