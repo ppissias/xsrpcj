@@ -47,7 +47,7 @@ Lets take it **step by step**.
 
   
 
-### Service Description
+### Service description
 
 Services are described in a JSON file. A simple example is provided below:
 
@@ -86,20 +86,22 @@ and each **service** definition has :
  - an **optional callback type**: This is the data type we get back asynchronously from time to time as a result of invoking the service
 
   
+### Code generation
 
-after invoking the xsrpcj code generator, we will get a server-side API and a client-side API. 
+after invoking the xsrpcj code generator for a service description file, we will get a server-side API and a client-side API. 
 
 
-**Client Side**
+**Client Side API**
+
 For the client-side we will get an interface & its implementation for each Server, which is all we need to start invoking services.
 
 For the example above we will get  a client side interface:
 
     public interface PersonsClientService {
 
-	public SearchPersonResponse search(SearchPersonRequest request) throws RemoteCommunicationsException;		
+		public SearchPersonResponse search(SearchPersonRequest request) throws RemoteCommunicationsException;		
 		
-	public PersonNotificationResponse notify(PersonNotificationRequest request) throws RemoteCommunicationsException;
+		public PersonNotificationResponse notify(PersonNotificationRequest request) throws RemoteCommunicationsException;
 	}		
 		
 
@@ -125,11 +127,10 @@ The way to start invoking services is :
 		PersonNotificationResponse notResp = serverRef.notify(....);
 
 					
-Notice that we need to pass a "callback handler" (`cbHandler`) when we instantiate `ExampleClientServiceImpl` ? We need to do this for each service that implements a callback. This is needed because we need to provide a handler for the asynchronous callback messages. 
-
-So if we used no services with callbacks, the constructor would not need a callback handler and if we used 10 services with callbacks, the constructor would need 10 callback handlers, one for each service. 
+Notice that we need to pass a "callback handler" (`cbHandler`) when we instantiate `ExampleClientServiceImpl`. We need to do this for each service that implements a callback, as we need to provide a handler for the asynchronous callback messages. 
 
 In our particular case, we only have 1 service with a callback, so we need to provide just 1 callback handler. 
+
 The callback handler needs to implement an interface which defines a method able to process the callback  messages. In our particular example it looks like:
 
     public interface PersonsNotifyClientCallback {
@@ -139,7 +140,7 @@ The callback handler needs to implement an interface which defines a method able
 
 The naming convention comes from the Server and Service name descriptions, which can be as small and simple as you like, or long if you like detailed names.     
 
-Besides the callback, we pass an additional argument, `serverHost`which is the host where the service is implemented (we can also pass a port argument, if the server listens on a different port than the default)
+Besides the callback, we pass an additional argument, `serverHost` which is the host where the service is implemented (we can also pass a port argument, if the server listens on a different port than the default)
 
     ExampleClientService serverRefDefaultPort = new ExampleClientServiceImpl("localhost", cbHandler);
     	
@@ -148,7 +149,7 @@ Even though the service description already has a predefined port, on the client
     ExampleClientService serverRef = new ExampleClientServiceImpl("localhost", 22100, cbHandler);
     
 
-**Server side**
+**Server side API**
   
 On the server side, we of course need to start the server. 
 
@@ -164,6 +165,7 @@ On the server side, we of course need to start the server.
 		//new PersonsServer(serviceImplementation, 22123).start();
 
 We can use the default port, or use a custom port by invoking another constructor. Everything is automatically generated except the `serviceImplementation`, which is the actual implementation of your service. 
+
 Lets look at the generated interface that you need to implement. 
 
     public interface PersonsServerService {
@@ -173,20 +175,23 @@ Lets look at the generated interface that you need to implement.
 		public PersonNotificationResponse notify(PersonNotificationRequest request, PersonsNotifyServerCallback callback);	
 	}
 		
-}
+
 		
 It is the kind of interface that you would expect, according to the service description. Notice that you receive a callback object on method `notify` that you can use in order to send asynchronously responses to the caller. The underlying implementation is automatically generated and will route back the reply to the client callback handler on the client side. 
 
-That's it ! You can see the full example source code here for the 
+That's it ! 
 
- - .proto message definition file : [SearchMessages.proto](https://github.com/ppissias/xsrpcj-examples/blob/master/xsrpcj-simple/proto/SearchMessages.proto)
+You can see the full example source code here for the 
+
+ - .proto message definition file : [SearchMessages.proto](https://github.com/ppissias/xsrpcj-examples/blob/master/xsrpcj-simple/src/main/proto/SearchMessages.proto)
+  - service description file : [service-desc.json](https://github.com/ppissias/xsrpcj-examples/blob/master/xsrpcj-simple/src/main/proto/service-desc.json)
  - Client Implementation : [SearchExampleServer.java](https://github.com/ppissias/xsrpcj-examples/blob/master/xsrpcj-simple/src/main/java/SearchExampleServer.java) 
  - Server Implementation : [SearchExampleClient.java](https://github.com/ppissias/xsrpcj-examples/blob/master/xsrpcj-simple/src/main/java/SearchExampleClient.java)
 
   
 ## Examples
 
-Download the xsrpcj examples project (https://github.com/ppissias/xsrpcj-examples) which contains several examples on using xsrpcj and also examples that can be used to compare the performance of xsrpcj and grpc for the same services.
+Download the xsrpcj examples project (https://github.com/ppissias/xsrpcj-examples) which contains several examples on using xsrpcj.
 
 
 ## Compiling
@@ -209,7 +214,7 @@ The generator can be used in 2 ways:
 Lets see both of them in detail: 
 
 ### running the produced .jar (standalone or via ant / maven / ... )
-First of all you need to define an environment variable pointing to the protoc compiler executable full path  (i.e. `PROTOC_PATH = /path/to/protoc` )
+First of all you need to define an environment variable named `PROTOC_PATH` pointing to the protoc compiler executable full path  (i.e. `PROTOC_PATH = /path/to/protoc` )
 
 Then you can invoke the code generator
 
@@ -286,12 +291,12 @@ after invoking the generator as
             |               simple
             |                   |   SearchMessages.java
             |                   |
-            |                   client 										-Client generated code 
-            |                   |       PersonsClientService.java			-Client service interface
-            |                   |       PersonsClientServiceImpl.java 		-Client service implementation
-            |                   |       PersonsNotifyClientCallback.java 	-Client callback interface (to be implemented as a handler) 
+            |                   client	-Client generated code 
+            |                   |       PersonsClientService.java		-Client service interface
+            |                   |       PersonsClientServiceImpl.java	-Client service implementation
+            |                   |       PersonsNotifyClientCallback.java	-Client callback interface (to be implemented as a handler) 
             |                   |
-            |                   comms										-Infrastructure code (low level RPC implementation) 
+            |                   comms		-Infrastructure code (low level RPC implementation) 
             |                   |       ClientReplyHandler.java
             |                   |       DataHandler.java
             |                   |       ErrorHandler.java
@@ -301,17 +306,17 @@ after invoking the generator as
             |                   |       SocketDataTransceiver.java
             |                   |       SocketDataTransceiverReaderThread.java
             |                   |
-            |                   server										-Server Generated code
-            |                   |       PersonsClientHandler.java 			-Internal class handling client requests
+            |                   server	-Server Generated code
+            |                   |       PersonsClientHandler.java		-Internal class handling client requests
             |                   |       PersonsNotifyServerCallback.java	-Server callback interface (implementations of this interface are provided in method calls)
-            |                   |       PersonsServer.java					-The class we use to start the server 
-            |                   |       PersonsServerService.java			-The Server service interface, needs to be implemented in order to define the logic of our services 
+            |                   |       PersonsServer.java	-The class we use to start the server 
+            |                   |       PersonsServerService.java		-The Server service interface, needs to be implemented in order to define the logic of our services 
             |                   |
-            |                   types										-Internal data types
-            |                           Persons.java 						-Generated Data types from PersonsMessageContainer.proto
+            |                   types		-Internal data types
+            |                           Persons.java	-Generated Data types from PersonsMessageContainer.proto
             |
             proto
-                    PersonsMessageContainer.proto 							-Generated (and compiled) internal .proto file. It contains an envelope (packet) that carries the messages from our services
+                    PersonsMessageContainer.proto	-Generated (and compiled) internal .proto file. It contains an envelope (packet) that carries the messages from our services
                     SearchMessages.proto
                     service-desc.json
 
@@ -319,7 +324,7 @@ after invoking the generator as
 You can navigate the [example source code](https://github.com/ppissias/xsrpcj-examples/tree/master/xsrpcj-simple) to see the content of the files in detail.  
 You don't need to know the contents of each file, you are guided in what you need to implement by trying to use the client and server side code. 
 
-**On the client side**
+### Implementing the client side
 
 when you try to use the generated code in order to invoke services, for example: 
 
@@ -330,7 +335,7 @@ you will notice that the constructor of the service implementation (`PersonsClie
     PersonsClientServiceImpl(String host, PersonsNotifyClientCallback clientnotifyCallback)
 requires a callback handler (`PersonsNotifyClientCallback`) that you need to implement. 
  
-**On the server side** 
+### Implementing the server side
 
 when you try to start the server: 
 
@@ -443,9 +448,6 @@ Please read feel free to extend the project!
 
   
 
-
-  
-
 ## License
 
   
@@ -460,4 +462,4 @@ This project is licensed under the MIT License (https://opensource.org/licenses/
 
   
 
-* Thanks of course to the protocol buffers developers, the velocity engine developers and the gson developers ! 
+* Thanks to the protocol buffers developers, the velocity engine developers and the gson developers ! 
