@@ -202,7 +202,7 @@ after downloading the repository, go to the home directory and type
 
     mvn clean compile assembly:single
 
-This command will compile everything and assemble it as a single executable jar. You can then use the produced .jar file (see section below) in order to generate your RPC code.  You can also use it through ant and maven (see sections below).
+This command will compile everything and assemble it as a single executable jar (named xsrpcj-1.0.0-jar-with-dependencies.jar). You can then use the produced .jar file (see section below) in order to generate your RPC code.  You can also use it through ant and maven (see sections below).
 If you plan to use the generator via Maven, then optionally you can compile it for your local repository
 
     mvn clean install
@@ -223,7 +223,7 @@ First of all you need to define an environment variable named `PROTOC_PATH` poin
 Then you can invoke the code generator
 
 
-    java -jar xsrpcgen-1.0-SNAPSHOT-jar-with-dependencies.jar
+    java -jar xsrpcj-1.0.0-jar-with-dependencies.jar
     
     expected arguments: [-client] [-server] [-infrastructure] <source generation path> <service-description-file>
 
@@ -254,7 +254,7 @@ for example assuming that you have the following service description file in `pr
 
 when you invoke the code generator with the following arguments: 
 
-        java -jar xsrpcgen-1.0-SNAPSHOT.jar -server -client -infrastructure src proto/service-desc.json 
+        java -jar xsrpcj-1.0.0-jar-with-dependencies.jar -server -client -infrastructure src proto/service-desc.json 
 
 
 It will generate the required code for the server, client and the common infrastructure files (used for the low level communication). The infrastructure files (`infrastructure` section in the JSON file) are needed only once, so if you generate multiple services on the same application you do not need to generate them again and again. 
@@ -284,7 +284,7 @@ Before the generation we started with the following file structure
 
 after invoking the generator as
 
-    java -jar xsrpcgen-1.0-SNAPSHOT.jar -server -client -infrastructure src proto/service-desc.json
+    java -jar xsrpcj-1.0.0-jar-with-dependencies.jar -server -client -infrastructure src proto/service-desc.json
 
  we will have
 
@@ -469,7 +469,7 @@ In short:
 
   
 
-Please read feel free to extend the project!
+Please feel free to extend the project!
 
   
 
