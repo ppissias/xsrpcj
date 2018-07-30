@@ -441,7 +441,7 @@ In short:
 					<version>1.6.0</version>
 					<executions>
 
-						<!--  generate RPC java code and compile generated .proto file with the xsrpcj generator-->
+						<!--  generate RPC code & compile the generated .proto file -->
 						<execution>
 							<id>generate RPC stubs</id>
 							<phase>generate-sources</phase>
