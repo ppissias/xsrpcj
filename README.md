@@ -359,7 +359,7 @@ requires an implementation of the `PersonsServerService` , which defines the ser
 
 In this example, these are the only things you need to do. 
 
-### running invoking the generator programatically
+### running the generator programatically
 you can invoke the generator by calling the static method
 
     XsRPCJGenerator.generate
